@@ -179,18 +179,20 @@ function SelectField({
   error?: string;
 }) {
   return (
-    <div className="group">
-      <label className="block text-sm font-semibold text-slate-600 mb-1.5">
-        {label} {required && <span className="text-rose-500">*</span>}
+    <div>
+      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+        {label} {required && <span className="text-rose-400">*</span>}
       </label>
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full appearance-none bg-white border-2 rounded-xl px-4 py-3 pr-10 text-slate-800 font-medium focus:outline-none focus:ring-4 transition-all duration-200 cursor-pointer ${
+          className={`w-full appearance-none bg-slate-50 border rounded-2xl px-4 py-3.5 pr-10 text-slate-800 font-medium focus:outline-none focus:ring-2 transition-all duration-200 cursor-pointer text-sm ${
             error
-              ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
-              : 'border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/10'
+              ? 'border-rose-300 bg-rose-50 focus:border-rose-400 focus:ring-rose-400/20'
+              : value
+              ? 'border-emerald-300 bg-emerald-50/30 focus:border-emerald-400 focus:ring-emerald-400/20'
+              : 'border-slate-200 hover:border-slate-300 focus:border-emerald-400 focus:ring-emerald-400/20'
           }`}
         >
           <option value="">{placeholder}</option>
@@ -198,7 +200,7 @@ function SelectField({
             <option key={opt} value={opt}>{opt}</option>
           ))}
         </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors ${value ? 'text-emerald-500' : 'text-slate-400'}`} />
       </div>
       {error && <p className="mt-1.5 text-xs font-medium text-rose-500 flex items-center gap-1">⚠ {error}</p>}
     </div>
@@ -224,18 +226,20 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-slate-600 mb-1.5">
-        {label} {required && <span className="text-rose-500">*</span>}
+      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+        {label} {required && <span className="text-rose-400">*</span>}
       </label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full border-2 rounded-xl px-4 py-3 text-slate-800 font-medium focus:outline-none focus:ring-4 transition-all duration-200 placeholder:text-slate-400 placeholder:font-normal bg-white ${
+        className={`w-full border rounded-2xl px-4 py-3.5 text-slate-800 font-medium focus:outline-none focus:ring-2 transition-all duration-200 placeholder:text-slate-400 placeholder:font-normal text-sm ${
           error
-            ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
-            : 'border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/10'
+            ? 'border-rose-300 bg-rose-50 focus:border-rose-400 focus:ring-rose-400/20'
+            : value
+            ? 'border-emerald-300 bg-emerald-50/30 focus:border-emerald-400 focus:ring-emerald-400/20'
+            : 'border-slate-200 bg-slate-50 hover:border-slate-300 focus:border-emerald-400 focus:ring-emerald-400/20'
         }`}
       />
       {error && <p className="mt-1.5 text-xs font-medium text-rose-500 flex items-center gap-1">⚠ {error}</p>}
@@ -260,8 +264,8 @@ function RadioGroup({
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-slate-600 mb-3">
-        {label} {required && <span className="text-rose-500">*</span>}
+      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+        {label} {required && <span className="text-rose-400">*</span>}
       </label>
       <div className="flex flex-wrap gap-3">
         {options.map((opt) => (
@@ -269,12 +273,12 @@ function RadioGroup({
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
-            className={`flex items-center gap-2.5 px-5 py-3 rounded-xl border-2 font-semibold text-sm transition-all duration-200 ${
+            className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl border font-semibold text-sm transition-all duration-200 ${
               value === opt.value
-                ? 'border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-200'
+                ? 'border-emerald-500 bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200'
                 : error
-                ? 'border-rose-300 bg-white text-slate-600 hover:border-rose-400 hover:bg-rose-50'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:bg-emerald-50'
+                ? 'border-rose-200 bg-white text-slate-600 hover:border-rose-300'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'
             }`}
           >
             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -305,14 +309,17 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-      <div className={`px-6 py-4 ${color} flex items-center gap-3`}>
-        <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-100/80 overflow-hidden">
+      <div className={`px-6 py-5 ${color} flex items-center gap-4`}>
+        <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
           <Icon className="w-5 h-5 text-white" />
         </div>
-        <div>
-          <p className="text-xs font-bold text-white/70 uppercase tracking-widest">Bagian {number}</p>
+        <div className="flex-1">
+          <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Langkah {number}</p>
           <h2 className="text-base font-bold text-white leading-tight">{title}</h2>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+          <span className="text-white/80 font-black text-sm">{number}</span>
         </div>
       </div>
       <div className="p-6 sm:p-8 space-y-5">{children}</div>
@@ -330,11 +337,13 @@ function AddressBlock({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+    <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl p-5 border border-slate-200/60">
       <div className="flex items-center gap-2 mb-4">
-        <MapPin className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-        <span className="text-sm font-bold text-slate-700">
-          {title} {required && <span className="text-rose-500">*</span>}
+        <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center">
+          <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+        </div>
+        <span className="text-xs font-black text-slate-600 uppercase tracking-wider">
+          {title} {required && <span className="text-rose-400">*</span>}
         </span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">{children}</div>
@@ -351,45 +360,36 @@ function ConfirmModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-        onClick={onCancel}
-      />
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in">
-        <button
-          onClick={onCancel}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-amber-50 mx-auto mb-4">
-          <AlertTriangle className="w-7 h-7 text-amber-500" />
-        </div>
-
-        <h3 className="text-lg font-extrabold text-slate-900 text-center mb-2">
-          Konfirmasi Pengiriman
-        </h3>
-        <p className="text-slate-500 text-sm text-center leading-relaxed mb-6">
-          Apakah kamu yakin data yang diisi sudah benar dan ingin menyimpan data ini?
-        </p>
-
-        <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all duration-200"
-          >
-            Cek Kembali
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onCancel} />
+      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
+        {/* Top accent */}
+        <div className="h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500" />
+        <div className="p-7">
+          <button onClick={onCancel} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <X className="w-4 h-4 text-slate-500" />
           </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200 transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <Send className="w-4 h-4" />
-            Yakin, Simpan!
-          </button>
+          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 mx-auto mb-5">
+            <AlertTriangle className="w-8 h-8 text-amber-500" />
+          </div>
+          <h3 className="text-xl font-black text-slate-900 text-center mb-2">Konfirmasi Data</h3>
+          <p className="text-slate-500 text-sm text-center leading-relaxed mb-7">
+            Pastikan semua data yang kamu isi sudah benar sebelum disimpan. Data tidak bisa diubah setelah dikirim.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-3.5 rounded-2xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all duration-200"
+            >
+              Cek Kembali
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-200 transition-all duration-200 flex items-center justify-center gap-2 active:scale-95"
+            >
+              <Send className="w-4 h-4" />
+              Yakin, Simpan!
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -561,24 +561,28 @@ export default function App() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-10">
-            <div className="mx-auto w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mb-6 shadow-lg shadow-emerald-200">
+          {/* Glow effect */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
+          </div>
+          <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-10">
+            <div className="mx-auto w-24 h-24 rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/30">
               <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
-            <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full mb-4">
+            <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-4 py-2 rounded-full mb-5 border border-emerald-500/30">
               <Sparkles className="w-3.5 h-3.5" />
               Data Berhasil Disimpan
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Terima Kasih atas Partisipasimu!</h2>
-            <p className="text-slate-500 leading-relaxed text-sm mb-4">
+            <h2 className="text-2xl font-black text-white mb-3">Terima Kasih atas Partisipasimu!</h2>
+            <p className="text-white/60 leading-relaxed text-sm mb-4">
               Data kamu sudah kami terima dan tersimpan dengan aman. Informasi ini akan sangat membantu kami dalam memetakan dan menghubungkan teman-teman Dompu yang ada di Yogyakarta.
             </p>
-            <p className="text-slate-400 text-xs leading-relaxed">
+            <p className="text-white/40 text-xs leading-relaxed">
               Semoga kita bisa saling terhubung, mendukung satu sama lain, dan bersama-sama memajukan IKPMD Jogja. Sampai jumpa di kegiatan berikutnya! 🌿
             </p>
-            <div className="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400">
+            <div className="mt-8 pt-6 border-t border-white/10 text-xs text-white/30">
               IKPMD Jogja — Ikatan Keluarga Putra-Putri Dompu di Yogyakarta
             </div>
           </div>
@@ -588,54 +592,60 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Confirm Modal */}
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {showConfirm && (
-        <ConfirmModal
-          onConfirm={handleConfirmedSubmit}
-          onCancel={() => setShowConfirm(false)}
-        />
+        <ConfirmModal onConfirm={handleConfirmedSubmit} onCancel={() => setShowConfirm(false)} />
       )}
 
       {/* Hero Header */}
-      <header className="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-500">
-        <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full" />
-        <div className="absolute -bottom-20 -left-10 w-80 h-80 bg-white/5 rounded-full" />
-        <div className="absolute top-8 right-1/3 w-32 h-32 bg-white/5 rounded-full" />
+      <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-900">
+        {/* Mesh gradient blobs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-teal-400/15 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-2xl" />
 
-        <div className="relative max-w-4xl mx-auto px-4 pt-12 pb-16 sm:pt-16 sm:pb-20 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
-            <Users className="w-4 h-4 text-emerald-200" />
-            <span className="text-sm font-bold text-white tracking-wide">IKPMD Jogja</span>
+        <div className="relative max-w-4xl mx-auto px-6 pt-14 pb-20 sm:pt-20 sm:pb-24 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-8">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <Users className="w-4 h-4 text-emerald-300" />
+            <span className="text-sm font-bold text-white/90 tracking-wide">IKPMD Jogja</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
-            Halo Teman-Teman<br />
-            <span className="text-emerald-200">Dompu di Jogja!</span>
+
+          <h1 className="text-4xl sm:text-6xl font-black text-white mb-5 leading-[1.1] tracking-tight">
+            Halo Teman-Teman
+            <br />
+            <span className="bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+              Dompu di Jogja!
+            </span>
           </h1>
-          <p className="text-emerald-100 text-sm sm:text-base max-w-lg mx-auto leading-relaxed mb-8">
+
+          <p className="text-white/60 text-sm sm:text-base max-w-lg mx-auto leading-relaxed mb-10">
             Form pendataan ini dibuat agar kita bisa saling terhubung, memetakan teman-teman Dompu, dan mendukung kegiatan IKPMD.
           </p>
+
           <div className="flex flex-wrap justify-center gap-3">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-4 py-2.5">
-              <Phone className="w-4 h-4 text-emerald-200" />
-              <span className="text-xs font-medium text-white/90">Data bersifat rahasia</span>
+            <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-2.5">
+              <Phone className="w-4 h-4 text-emerald-300" />
+              <span className="text-xs font-semibold text-white/70">Data bersifat rahasia</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-4 py-2.5">
-              <ArrowRight className="w-4 h-4 text-emerald-200" />
-              <span className="text-xs font-medium text-white/90">Hanya 4 langkah mudah</span>
+            <div className="flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-2.5">
+              <ArrowRight className="w-4 h-4 text-emerald-300" />
+              <span className="text-xs font-semibold text-white/70">Hanya 4 langkah mudah</span>
             </div>
           </div>
         </div>
 
+        {/* Bottom curve */}
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path d="M0 40L1440 40L1440 20C1200 0 960 40 720 20C480 0 240 40 0 20L0 40Z" fill="#f8fafc"/>
+          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+            <path d="M0 60L1440 60L1440 30C1080 0 720 60 360 30C180 15 90 45 0 30L0 60Z" fill="#f8fafc"/>
           </svg>
         </div>
       </header>
 
       {/* Form */}
-      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-10">
+      <main className="max-w-4xl mx-auto px-4 py-10 sm:py-12">
         <form onSubmit={handleSubmit} className="space-y-5">
 
           {/* Section 1: Data Pribadi */}
@@ -858,7 +868,7 @@ export default function App() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 active:scale-[0.98] text-white font-bold px-8 py-4 rounded-2xl shadow-lg shadow-emerald-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed text-base"
+              className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-slate-900 via-emerald-900 to-teal-900 hover:from-slate-800 hover:via-emerald-800 hover:to-teal-800 active:scale-[0.98] text-white font-black px-8 py-5 rounded-2xl shadow-xl shadow-slate-900/20 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed text-base tracking-wide"
             >
               {submitting ? (
                 <>
@@ -868,20 +878,25 @@ export default function App() {
               ) : (
                 <>
                   <Send className="w-5 h-5" />
-                  Kirim Data
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                  Kirim Data Sekarang
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
             <p className="text-center text-xs text-slate-400 mt-3">
-              Data kamu aman dan hanya digunakan untuk keperluan internal IKPMD
+              🔒 Data kamu aman dan hanya digunakan untuk keperluan internal IKPMD
             </p>
           </div>
         </form>
       </main>
 
-      <footer className="text-center py-6 text-xs text-slate-400 border-t border-slate-200 bg-white">
-        © 2026 IKPMD Jogja — Ikatan Keluarga Putra-Putri Dompu di Yogyakarta
+      <footer className="text-center py-8 text-xs text-slate-400 border-t border-slate-100 bg-white">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="font-semibold text-slate-500">IKPMD Jogja</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+        </div>
+        Ikatan Keluarga Putra-Putri Dompu di Yogyakarta © 2026
       </footer>
     </div>
   );
