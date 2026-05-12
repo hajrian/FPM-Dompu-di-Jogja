@@ -18,6 +18,8 @@ import {
   Users,
   ArrowRight,
   Sparkles,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
 
 type FormData = {
@@ -34,7 +36,7 @@ type FormData = {
   nomor_hp: string;
   status_saat_ini: string;
   perguruan_tinggi: string;
-  fakultas_jurusan: string;
+  jurusan: string;
   tahun_masuk: string;
   program_studi: string;
   nama_perusahaan: string;
@@ -57,7 +59,7 @@ const initialFormData: FormData = {
   nomor_hp: '',
   status_saat_ini: '',
   perguruan_tinggi: '',
-  fakultas_jurusan: '',
+  jurusan: '',
   tahun_masuk: '',
   program_studi: '',
   nama_perusahaan: '',
@@ -129,8 +131,8 @@ function validate(data: FormData): FormErrors {
     if (!data.perguruan_tinggi.trim()) {
       errors.perguruan_tinggi = 'Nama perguruan tinggi wajib diisi';
     }
-    if (!data.fakultas_jurusan.trim()) {
-      errors.fakultas_jurusan = 'Fakultas/jurusan wajib diisi';
+    if (!data.jurusan.trim()) {
+      errors.jurusan = 'Jurusan wajib diisi';
     }
     if (data.tahun_masuk) {
       const tahun = parseInt(data.tahun_masuk);
@@ -340,12 +342,67 @@ function AddressBlock({
   );
 }
 
+function ConfirmModal({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+        onClick={onCancel}
+      />
+      {/* Modal */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in">
+        <button
+          onClick={onCancel}
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-amber-50 mx-auto mb-4">
+          <AlertTriangle className="w-7 h-7 text-amber-500" />
+        </div>
+
+        <h3 className="text-lg font-extrabold text-slate-900 text-center mb-2">
+          Konfirmasi Pengiriman
+        </h3>
+        <p className="text-slate-500 text-sm text-center leading-relaxed mb-6">
+          Apakah kamu yakin data yang diisi sudah benar dan ingin menyimpan data ini?
+        </p>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all duration-200"
+          >
+            Cek Kembali
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200 transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <Send className="w-4 h-4" />
+            Yakin, Simpan!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const update = useCallback(
     (field: keyof FormData) => (value: string) => {
@@ -435,7 +492,6 @@ export default function App() {
     const validationErrors = validate(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      // Scroll to first error
       setTimeout(() => {
         const el = document.querySelector('[data-error="true"]');
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -443,8 +499,33 @@ export default function App() {
       return;
     }
 
+    // Show confirmation modal
+    setShowConfirm(true);
+  };
+
+  const handleConfirmedSubmit = async () => {
+    setShowConfirm(false);
+    setSubmitError('');
     setSubmitting(true);
     try {
+      // Cek duplikat berdasarkan nomor_hp + tanggal_lahir
+      const { data: existing, error: checkError } = await supabase
+        .from('form_submissions')
+        .select('id')
+        .eq('nomor_hp', formData.nomor_hp.replace(/\s|-/g, ''))
+        .eq('tanggal_lahir', formData.tanggal_lahir)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existing) {
+        setSubmitError(
+          'Data dengan nomor HP dan tanggal lahir ini sudah pernah didaftarkan. Jika ada kesalahan, hubungi panitia IKPMD.'
+        );
+        setSubmitting(false);
+        return;
+      }
+
       const { error: insertError } = await supabase
         .from('form_submissions')
         .insert({
@@ -458,10 +539,10 @@ export default function App() {
           alamat_dompu_kabkota: formData.alamat_dompu_kabkota,
           alamat_dompu_kecamatan: formData.alamat_dompu_kecamatan,
           alamat_dompu_kelurahan: formData.alamat_dompu_kelurahan,
-          nomor_hp: formData.nomor_hp,
+          nomor_hp: formData.nomor_hp.replace(/\s|-/g, ''),
           status_saat_ini: formData.status_saat_ini,
           perguruan_tinggi: formData.status_saat_ini === 'Kuliah' ? formData.perguruan_tinggi : null,
-          fakultas_jurusan: formData.status_saat_ini === 'Kuliah' ? formData.fakultas_jurusan : null,
+          fakultas_jurusan: formData.status_saat_ini === 'Kuliah' ? formData.jurusan : null,
           tahun_masuk: formData.status_saat_ini === 'Kuliah' ? formData.tahun_masuk : null,
           program_studi: formData.status_saat_ini === 'Kuliah' ? formData.program_studi : null,
           nama_perusahaan: formData.status_saat_ini === 'Bekerja' ? formData.nama_perusahaan : null,
@@ -490,9 +571,12 @@ export default function App() {
               <Sparkles className="w-3.5 h-3.5" />
               Data Berhasil Disimpan
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Terima Kasih!</h2>
-            <p className="text-slate-500 leading-relaxed text-sm">
-              Data kamu sudah kami terima. Semoga informasi ini bermanfaat untuk memperkuat tali silaturahmi teman-teman Dompu di Jogja.
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Terima Kasih atas Partisipasimu!</h2>
+            <p className="text-slate-500 leading-relaxed text-sm mb-4">
+              Data kamu sudah kami terima dan tersimpan dengan aman. Informasi ini akan sangat membantu kami dalam memetakan dan menghubungkan teman-teman Dompu yang ada di Yogyakarta.
+            </p>
+            <p className="text-slate-400 text-xs leading-relaxed">
+              Semoga kita bisa saling terhubung, mendukung satu sama lain, dan bersama-sama memajukan IKPMD Jogja. Sampai jumpa di kegiatan berikutnya! 🌿
             </p>
             <div className="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400">
               IKPMD Jogja — Ikatan Keluarga Putra-Putri Dompu di Yogyakarta
@@ -505,30 +589,32 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Confirm Modal */}
+      {showConfirm && (
+        <ConfirmModal
+          onConfirm={handleConfirmedSubmit}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+
       {/* Hero Header */}
       <header className="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-500">
-        {/* Decorative circles */}
         <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full" />
         <div className="absolute -bottom-20 -left-10 w-80 h-80 bg-white/5 rounded-full" />
         <div className="absolute top-8 right-1/3 w-32 h-32 bg-white/5 rounded-full" />
 
-        <div className="relative max-w-2xl mx-auto px-4 pt-12 pb-16 sm:pt-16 sm:pb-20 text-center">
-          {/* Badge */}
+        <div className="relative max-w-4xl mx-auto px-4 pt-12 pb-16 sm:pt-16 sm:pb-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
             <Users className="w-4 h-4 text-emerald-200" />
             <span className="text-sm font-bold text-white tracking-wide">IKPMD Jogja</span>
           </div>
-
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
             Halo Teman-Teman<br />
             <span className="text-emerald-200">Dompu di Jogja!</span>
           </h1>
-
           <p className="text-emerald-100 text-sm sm:text-base max-w-lg mx-auto leading-relaxed mb-8">
             Form pendataan ini dibuat agar kita bisa saling terhubung, memetakan teman-teman Dompu, dan mendukung kegiatan IKPMD.
           </p>
-
-          {/* Stats row */}
           <div className="flex flex-wrap justify-center gap-3">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-4 py-2.5">
               <Phone className="w-4 h-4 text-emerald-200" />
@@ -541,7 +627,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Wave bottom */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
             <path d="M0 40L1440 40L1440 20C1200 0 960 40 720 20C480 0 240 40 0 20L0 40Z" fill="#f8fafc"/>
@@ -550,7 +635,7 @@ export default function App() {
       </header>
 
       {/* Form */}
-      <main className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-10">
         <form onSubmit={handleSubmit} className="space-y-5">
 
           {/* Section 1: Data Pribadi */}
@@ -684,12 +769,12 @@ export default function App() {
                 error={errors.perguruan_tinggi}
               />
               <InputField
-                label="Fakultas / Jurusan"
-                value={formData.fakultas_jurusan}
-                onChange={update('fakultas_jurusan')}
-                placeholder="Contoh: Fakultas Teknik"
+                label="Jurusan"
+                value={formData.jurusan}
+                onChange={update('jurusan')}
+                placeholder="Contoh: Teknik Informatika"
                 required
-                error={errors.fakultas_jurusan}
+                error={errors.jurusan}
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <InputField
