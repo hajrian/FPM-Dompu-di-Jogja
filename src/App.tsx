@@ -18,7 +18,7 @@ import {
   Users,
   ArrowRight,
   Sparkles,
-  AlertTriangle,
+  AlertTriangle as _AlertTriangle,
   X,
 } from 'lucide-react';
 
@@ -359,37 +359,81 @@ function ConfirmModal({
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onCancel} />
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
-        {/* Top accent */}
-        <div className="h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500" />
-        <div className="p-7">
-          <button onClick={onCancel} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
-            <X className="w-4 h-4 text-slate-500" />
-          </button>
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 mx-auto mb-5">
-            <AlertTriangle className="w-8 h-8 text-amber-500" />
-          </div>
-          <h3 className="text-xl font-black text-slate-900 text-center mb-2">Konfirmasi Data</h3>
-          <p className="text-slate-500 text-sm text-center leading-relaxed mb-7">
-            Pastikan semua data yang kamu isi sudah benar sebelum disimpan. Data tidak bisa diubah setelah dikirim.
-          </p>
-          <div className="flex gap-3">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-slate-950/70 backdrop-blur-lg"
+        onClick={onCancel}
+      />
+
+      {/* Modal */}
+      <div className="relative w-full sm:max-w-md mx-4 mb-0 sm:mb-0 animate-in">
+        {/* Card */}
+        <div className="bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl">
+
+          {/* Gradient header band */}
+          <div className="relative bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-900 px-7 pt-8 pb-10 text-center overflow-hidden">
+            {/* Blobs */}
+            <div className="absolute top-0 left-1/4 w-40 h-40 bg-emerald-500/20 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 right-1/4 w-32 h-32 bg-teal-400/20 rounded-full blur-2xl" />
+
+            {/* Close button */}
             <button
               onClick={onCancel}
-              className="flex-1 px-4 py-3.5 rounded-2xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all duration-200"
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"
             >
-              Cek Kembali
+              <X className="w-4 h-4 text-white/70" />
+            </button>
+
+            {/* Icon */}
+            <div className="relative mx-auto w-20 h-20 mb-4">
+              <div className="absolute inset-0 bg-emerald-400/20 rounded-3xl blur-xl" />
+              <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400/30 to-teal-400/30 border border-white/20 flex items-center justify-center">
+                <Send className="w-9 h-9 text-emerald-300" />
+              </div>
+            </div>
+
+            <h3 className="text-xl font-black text-white mb-1.5">Siap Mengirim Data?</h3>
+            <p className="text-white/50 text-xs leading-relaxed">
+              Pastikan semua isian sudah benar.<br />Data tidak bisa diubah setelah dikirim.
+            </p>
+          </div>
+
+          {/* Checklist */}
+          <div className="px-7 py-5 bg-slate-50 border-b border-slate-100">
+            {[
+              'Data pribadi sudah lengkap dan benar',
+              'Nomor HP aktif dan bisa dihubungi',
+              'Alamat asal Dompu sudah dipilih',
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 py-2">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                </div>
+                <span className="text-xs font-medium text-slate-600">{item}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Actions */}
+          <div className="px-7 py-5 flex gap-3">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-3.5 rounded-2xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 active:scale-95 transition-all duration-150"
+            >
+              ← Cek Kembali
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-200 transition-all duration-200 flex items-center justify-center gap-2 active:scale-95"
+              className="flex-1 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-200 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2"
             >
               <Send className="w-4 h-4" />
-              Yakin, Simpan!
+              Yakin, Kirim!
             </button>
           </div>
+
+          {/* Safe bottom padding for mobile */}
+          <div className="h-safe-bottom sm:hidden" />
         </div>
       </div>
     </div>
